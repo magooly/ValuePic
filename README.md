@@ -1,25 +1,26 @@
-# 💰 ValuePics - Photo-Based Item Valuation App
+# ValuePic (ValuePics) - Android Photo Valuation App
 
-A powerful Android application that takes photos of items and automatically looks up their values on the internet.
+ValuePic is an Android app for documenting household items and estimating value from photos.
+It combines on-device image recognition with live web lookup so you can build an inventory with pricing context for insurance, estate planning, and personal records.
 
-## 🎯 Features
+## Why This Project
 
-### Core Functionality
-- 📸 **Photo Capture** - Take photos with device camera
-- 🔍 **Image Recognition** - Detect objects in photos using ML Kit
-- 💻 **Web Lookup** - Search internet for item values
-- 💰 **Automatic Valuation** - Find estimated market values
-- 💾 **Database Storage** - Store items with valuations
-- 📊 **Statistics** - Track total value and averages
-- 🔎 **Search & Filter** - Find previously valued items
+- Fast capture flow: photo -> detect -> lookup -> save
+- Structured inventory records with image evidence
+- Built for practical home/estate workflows (not just demo ML)
+- No paid API key required for baseline lookup flow
 
-### Valuation Features
-- Multi-source price lookup
-- Confidence scoring
-- Manual value override
-- Price history tracking
-- Source attribution
-- No paid API keys required for the initial lookup flow
+## Feature Highlights
+
+- Camera and gallery import for item photos
+- ML Kit object/label detection
+- Multi-source value lookup with confidence indicators
+- Manual value override when web prices are noisy
+- Room database storage for offline-friendly records
+- Search, filter, and detail views for existing items
+- Export/report pipeline for inventory documentation
+
+Keywords: android, kotlin, jetpack compose, room database, ml kit, image recognition, inventory app, item valuation, insurance inventory, estate planning
 
 ## 🏗️ Architecture
 
@@ -40,10 +41,10 @@ Supporting Services:
 - PhotoUtils (Photo Management)
 ```
 
-## 📦 Project Structure
+## Project Structure
 
 ```
-C:\wrhor\DataBase\
+C:\wrhor\ValuePicUnified\
 
 app/src/main/
 ├── java/com/example/valuefinder/
@@ -68,7 +69,7 @@ app/src/main/
 └── build.gradle.kts               # Build config
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Android Studio latest
@@ -90,13 +91,13 @@ Run → Run 'app'
 
 ### One-Click Release (Windows PowerShell)
 ```powershell
-cd C:\wrhor\DataBase
+cd C:\wrhor\ValuePicUnified
 powershell -ExecutionPolicy Bypass -File .\release.ps1
 ```
 
 ### Regenerate Notes PDFs (Windows PowerShell)
 ```powershell
-cd C:\wrhor\DataBase
+cd C:\wrhor\ValuePicUnified
 powershell -ExecutionPolicy Bypass -File .\make-notes-pdf.ps1
 ```
 
