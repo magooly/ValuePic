@@ -48,6 +48,5 @@ jobs:
           arch: x86_64
           profile: pixel_5
           script: |
-            ./gradlew :app:connectedDebugAndroidTest "-Pandroid.testInstrumentationRunnerArguments.class=com.example.valuefinder.ValuePicsDatabaseMigrationTest"
-            ./gradlew :app:connectedDebugAndroidTest "-Pandroid.testInstrumentationRunnerArguments.class=com.example.valuefinder.ValuePicsBackupRestoreSmokeTest"
+            ./gradlew :app:connectedDebugAndroidTest "-Pandroid.testInstrumentationRunnerArguments.class=com.example.valuefinder.ValuePicsDatabaseMigrationTest,com.example.valuefinder.ValuePicsBackupRestoreSmokeTest"
 
