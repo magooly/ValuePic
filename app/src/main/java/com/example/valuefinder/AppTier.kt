@@ -8,8 +8,8 @@ package com.example.valuefinder
 /**
  * The active app tier. Switchable at runtime from the overflow menu.
  *
- * PERSONAL   — purple/violet palette (former "abc" / Main flavour).
- * INSURANCE  — blue/navy palette   (former "xyz" / Other flavour).
+ * PERSONAL   — purple/violet palette.
+ * INSURANCE  — blue/navy palette.
  */
 enum class AppTier {
     PERSONAL,

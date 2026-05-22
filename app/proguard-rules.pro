@@ -1,7 +1,7 @@
 # Value Finder project-specific ProGuard rules.
 #
-# NOTE: abc and xyz build variants should NOT have R8/ProGuard enabled at all.
-# These variants are for development/debugging and should skip code shrinking
+# NOTE: development/debug variants should NOT have R8/ProGuard enabled.
+# These variants should skip code shrinking
 # to avoid TypeToken serialization issues and maintain debugging capability.
 # Only apply these rules to release builds where R8 is actually enabled.
 

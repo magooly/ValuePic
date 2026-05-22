@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.example.valuefinder.AppTier
 
-// ── Personal tier palette (purple/violet — formerly "abc" / Main flavour) ──────
+// Personal tier palette (purple/violet)
 private val PersonalLightColors = lightColorScheme(
     primary = Color(0xFF6200EE),
     secondary = Color(0xFF03DAC6),
@@ -34,7 +34,7 @@ private val PersonalDarkColors = darkColorScheme(
     outline = Color(0xFFC8C3CE),
 )
 
-// ── Insurance tier palette (blue/navy — formerly "xyz" / Other flavour) ─────────
+// Insurance tier palette (blue/navy)
 private val InsuranceLightColors = lightColorScheme(
     primary = Color(0xFF1565C0),
     secondary = Color(0xFF0288D1),

@@ -109,9 +109,6 @@ private const val PREF_PERSONAL_TIER_LAST_UNLOCK_MILLIS = "personal_tier_last_un
 private const val PERSONAL_TIER_TIMEOUT_MILLIS = 15L * 60L * 1000L
 private const val DEFAULT_WILL_OWNER_NAME = "Wally Horsman"
 private const val EXPORT_LOG_TAG = "ValuePicsExport"
-// Internal Gradle flavor IDs used by BuildConfig.FLAVOR.
-private const val FLAVOR_ID_MAIN = "abc"
-private const val FLAVOR_ID_OTHER = "xyz"
 
 enum class ThemeMode {
     LIGHT,

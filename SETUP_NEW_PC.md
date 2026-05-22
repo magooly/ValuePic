@@ -1,8 +1,6 @@
 # ValuePics New PC Setup Checklist
 
-This checklist lets you move the project to another Windows PC and build both app variants:
-- Main (internal flavor id: `abc`)
-- Other (internal flavor id: `xyz`)
+This checklist lets you move the project to another Windows PC and build the unified app.
 
 ## 1) Install prerequisites
 
@@ -39,16 +37,16 @@ For signed release builds, ensure these are available (Gradle properties or env 
 
 If you use a keystore file, restore it to the expected location too.
 
-## 5) Verify both variants compile
+## 5) Verify app compiles
 
 Run from project root:
 
 ```powershell
 cd C:\wrhor\DataBase
-.\gradlew assembleAbcDebug assembleXyzDebug
+.\gradlew assembleDebug
 ```
 
-## 6) Build and sync release APKs for distribution
+## 6) Build and sync release APK for distribution
 
 Use the one-command script:
 
@@ -58,20 +56,14 @@ Use the one-command script:
 
 Expected outputs:
 
-- `C:\wrhor\DataBase\Distribution\ValuePics-Main-Release.apk`
-- `C:\wrhor\DataBase\Distribution\ValuePics-Other-Release.apk`
+- `C:\wrhor\DataBase\Distribution\app-release.apk`
 
 ## 7) Quick sanity checks
 
-- App labels should be:
-  - `ValuePics Main`
-  - `ValuePics Other`
-- Default backup ZIP names should be flavor-specific:
-  - `VPicMain-<date-time>.zip`
-  - `VPicOther-<date-time>.zip`
+- App ID should be `com.example.valuefinder.unified`.
+- Default backup ZIP names should match unified branding.
 
 ## Notes
 
-- Internal Gradle flavor IDs remain `abc` and `xyz` for compatibility.
-- User-facing naming is Main/Other.
+- This repository is unified-only.
 
