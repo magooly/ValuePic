@@ -77,6 +77,17 @@ data class PdfTypographyConfig(
     val placeholderIndicatorSize: Float = 16f
 )
 
+private fun formatAudWithBillsSuffix(item: ValuedItem, amount: Double): String {
+    val base = MoneyUtils.formatAud(amount)
+    val period = resolveBillsEnteredPeriod(item.collectionName, item.billsEnteredPeriod) ?: return base
+    val suffix = when (period) {
+        BillsPeriod.WEEKLY -> " / Week"
+        BillsPeriod.MONTHLY -> " / Month"
+        BillsPeriod.YEARLY -> " / Year"
+    }
+    return base + suffix
+}
+
 /**
  * Builds PDF collection summary reports in a pure data-layer style.
  * Encapsulates all canvas drawing logic away from the repository.
@@ -339,7 +350,7 @@ internal class PdfReportBuilder {
                         draw { drawText(ellipsizeToWidth(description, 260f, textPaint), 245f, y, textPaint) }
                     }
                 }
-                val valueLabel = item.estimatedValue?.let { MoneyUtils.formatAud(it) } ?: "—"
+                val valueLabel = item.estimatedValue?.let { formatAudWithBillsSuffix(item, it) } ?: "—"
                 drawRightText(valueLabel, layoutConfig.valueRightX, y, textPaint)
                 y += if (includeThumbnails) rowHeight else typographyConfig.rowLeading
             }

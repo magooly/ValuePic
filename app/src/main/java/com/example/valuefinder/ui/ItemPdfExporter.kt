@@ -13,9 +13,11 @@ import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.util.Log
 import androidx.core.content.FileProvider
+import com.example.valuefinder.BillsPeriod
 import com.example.valuefinder.MoneyUtils
 import com.example.valuefinder.R
 import com.example.valuefinder.ValuedItem
+import com.example.valuefinder.resolveBillsEnteredPeriod
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -24,6 +26,18 @@ import java.util.Locale
 import kotlin.math.min
 
 private const val TAG_ITEM_PDF_EXPORTER = "ItemPdfExporter"
+
+private fun Context.billsValueSuffix(period: BillsPeriod): String = when (period) {
+    BillsPeriod.WEEKLY -> getString(R.string.bills_value_suffix_week)
+    BillsPeriod.MONTHLY -> getString(R.string.bills_value_suffix_month)
+    BillsPeriod.YEARLY -> getString(R.string.bills_value_suffix_year)
+}
+
+private fun Context.formatAudWithBillsSuffix(item: ValuedItem, amount: Double): String {
+    val base = MoneyUtils.formatAud(amount)
+    val period = resolveBillsEnteredPeriod(item.collectionName, item.billsEnteredPeriod) ?: return base
+    return base + billsValueSuffix(period)
+}
 
 /**
  * Builds a single-item PDF report and writes it to the app cache directory.
@@ -208,7 +222,9 @@ fun buildItemPdfUri(item: ValuedItem, context: Context): Uri? {
 
         y += 8f
         drawHeading(context.getString(R.string.pdf_section_valuation))
-        item.estimatedValue?.let { drawParagraph(context.getString(R.string.pdf_label_value_at_entry, MoneyUtils.formatAud(it))) }
+        item.estimatedValue?.let {
+            drawParagraph(context.getString(R.string.pdf_label_value_at_entry, context.formatAudWithBillsSuffix(item, it)))
+        }
         drawParagraph(context.getString(R.string.pdf_label_valuation_timestamp, valuedDateText))
         if (item.valueSource.isNotBlank()) drawParagraph(context.getString(R.string.pdf_label_value_source, item.valueSource))
         if (item.sourceUrl.isNotBlank())   drawParagraph(context.getString(R.string.pdf_label_source_url, item.sourceUrl))
@@ -233,7 +249,7 @@ fun buildItemPdfUri(item: ValuedItem, context: Context): Uri? {
             val recipient = extractWillRecipient(trimmedWill).ifBlank {
                 context.getString(R.string.pdf_will_recipient_unknown)
             }
-            val valueText = item.estimatedValue?.let { MoneyUtils.formatAud(it) }
+            val valueText = item.estimatedValue?.let { context.formatAudWithBillsSuffix(item, it) }
                 ?: context.getString(R.string.pdf_will_value_unknown)
             val descriptionText = firstOneLineDescription().ifBlank {
                 context.getString(R.string.pdf_will_description_unknown)

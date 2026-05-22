@@ -1879,6 +1879,7 @@ fun ItemListScreen(
                                 item = item,
                                 isSelectionMode = isSelectionMode,
                                 isSelected = selectedItemIds.contains(item.id),
+                                billsDisplayPeriodOverride = if (isBillsCollectionActive) selectedBillsPeriod else null,
                                 onToggleSelection = {
                                     selectedItemIds = selectedItemIds.toMutableSet().apply {
                                         if (!add(item.id)) remove(item.id)
@@ -2716,6 +2717,7 @@ fun ItemCard(
     item: ValuedItem,
     isSelectionMode: Boolean,
     isSelected: Boolean,
+    billsDisplayPeriodOverride: BillsPeriod? = null,
     onToggleSelection: () -> Unit,
     onClick: () -> Unit,
     onLongPress: () -> Unit,
@@ -2733,6 +2735,18 @@ fun ItemCard(
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    val billsValueSuffix = if (isBillsCollectionName(item.collectionName)) {
+        val displayPeriod = billsDisplayPeriodOverride
+            ?: resolveBillsEnteredPeriod(item.collectionName, item.billsEnteredPeriod)
+            ?: BillsPeriod.MONTHLY
+        when (displayPeriod) {
+            BillsPeriod.WEEKLY -> stringResource(R.string.bills_value_suffix_week)
+            BillsPeriod.MONTHLY -> stringResource(R.string.bills_value_suffix_month)
+            BillsPeriod.YEARLY -> stringResource(R.string.bills_value_suffix_year)
+        }
+    } else {
+        ""
     }
     Card(
         modifier = Modifier
@@ -2850,7 +2864,7 @@ fun ItemCard(
                             }
                     ) {
                         Text(
-                            MoneyUtils.formatAud(item.estimatedValue),
+                            MoneyUtils.formatAud(item.estimatedValue) + billsValueSuffix,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary
                         )

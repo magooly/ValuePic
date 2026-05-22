@@ -276,7 +276,7 @@ class ValuePicsRepository(context: Context) {
         // Keep restore backward-compatible with earliest JSON payload backups.
         private const val MIN_RESTORE_BACKUP_FORMAT_VERSION = 1
         private const val TAG = "ValuePicsRepository"
-        private const val RECORD_LIMIT = 12
+        private const val RECORD_LIMIT = 50
         // Feature gate only (not cryptographic security).
         private const val UNLOCK_PASSWORD = "Harbor7!"
         private const val SAMPLE_ASSET_ZIP = "example.zip"

@@ -92,6 +92,18 @@ import kotlinx.coroutines.launch
 
 private const val AUDIO_NOTE_PREF_KEY = "audio_note_high_quality"
 
+private fun Context.billsValueSuffix(period: BillsPeriod): String = when (period) {
+    BillsPeriod.WEEKLY -> getString(R.string.bills_value_suffix_week)
+    BillsPeriod.MONTHLY -> getString(R.string.bills_value_suffix_month)
+    BillsPeriod.YEARLY -> getString(R.string.bills_value_suffix_year)
+}
+
+private fun Context.formatAudWithBillsSuffix(item: ValuedItem, amount: Double): String {
+    val base = MoneyUtils.formatAud(amount)
+    val period = resolveBillsEnteredPeriod(item.collectionName, item.billsEnteredPeriod) ?: return base
+    return base + billsValueSuffix(period)
+}
+
 private data class DetailsEditState(
     val itemName: String,
     val collectionName: String,
@@ -669,7 +681,9 @@ fun DetailsScreen(
             if (item.collectionName.isNotBlank()) appendLine(context.getString(R.string.share_label_collection, item.collectionName))
             if (item.tags.isNotBlank()) appendLine(context.getString(R.string.share_label_tags, item.tags))
             if (item.itemDescription.isNotBlank()) appendLine(context.getString(R.string.share_label_description, item.itemDescription))
-            item.estimatedValue?.let { appendLine(context.getString(R.string.share_label_estimated_value, MoneyUtils.formatAud(it))) }
+            item.estimatedValue?.let {
+                appendLine(context.getString(R.string.share_label_estimated_value, context.formatAudWithBillsSuffix(item, it)))
+            }
             if (item.valueSource.isNotBlank()) appendLine(context.getString(R.string.share_label_value_source, item.valueSource))
             if (item.sourceUrl.isNotBlank()) appendLine(context.getString(R.string.share_label_source_url, item.sourceUrl))
             if (item.notes.isNotBlank()) appendLine(context.getString(R.string.share_label_notes, item.notes))
@@ -739,7 +753,9 @@ fun DetailsScreen(
 
         val text = buildString {
             append(context.getString(R.string.share_label_item, item.itemName))
-            item.estimatedValue?.let { append("\n${context.getString(R.string.share_label_estimated_value, MoneyUtils.formatAud(it))}") }
+            item.estimatedValue?.let {
+                append("\n${context.getString(R.string.share_label_estimated_value, context.formatAudWithBillsSuffix(item, it))}")
+            }
         }
 
         val intent = Intent(Intent.ACTION_SEND).apply {
@@ -1506,7 +1522,7 @@ fun DetailsScreen(
                 if (item.estimatedValue != null) {
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        MoneyUtils.formatAud(item.estimatedValue),
+                        context.formatAudWithBillsSuffix(item, item.estimatedValue),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.SemiBold
                     )
