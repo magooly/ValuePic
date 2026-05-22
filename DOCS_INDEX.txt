@@ -1,0 +1,34 @@
+ValuePics Documentation Index
+April 18, 2026
+
+This file lists the quick-reference guide documents currently available in the workspace root.
+
+--------------------------------------------------
+1) QA Device Checklist (Text)
+File: QA_DEVICE_CHECKLIST.txt
+Purpose: Plain-text device test checklist for release verification.
+Path: C:\wrhor\DataBase\QA_DEVICE_CHECKLIST.txt
+
+--------------------------------------------------
+2) QA Device Checklist (PDF)
+File: QA_DEVICE_CHECKLIST.pdf
+Purpose: PDF version of the device test checklist for easy sharing or printing.
+Path: C:\wrhor\DataBase\QA_DEVICE_CHECKLIST.pdf
+
+--------------------------------------------------
+3) Release Signing Setup (Text)
+File: RELEASE_SIGNING_SETUP.txt
+Purpose: Plain-text guide for configuring signed release builds using VALUEFINDER_* settings.
+Path: C:\wrhor\DataBase\RELEASE_SIGNING_SETUP.txt
+
+--------------------------------------------------
+4) Release Signing Setup (PDF)
+File: RELEASE_SIGNING_SETUP.pdf
+Purpose: PDF version of the release signing setup guide for sharing or printing.
+Path: C:\wrhor\DataBase\RELEASE_SIGNING_SETUP.pdf
+
+--------------------------------------------------
+Notes
+- All files listed above are stored in the workspace root.
+- Add future guide files here so they are easy to locate.
+

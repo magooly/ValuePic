@@ -1,0 +1,2 @@
+package:/data/app/com.example.valuefinder-ESC24y99s-wdbOdvqY3q6Q==/base.apk
+-rw-rw---- 1 root sdcard_rw 59126152 2026-04-30 21:34 /sdcard/Download/valuefinder-app-release.apk

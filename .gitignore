@@ -1,0 +1,79 @@
+# Android/Gradle
+.gradle/
+**/build/
+.local/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Local machine config
+local.properties
+
+# Signing keys and secrets
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+*.env
+
+# Logs
+*.log
+
+# Generated app artifacts
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Native/NDK outputs
+.externalNativeBuild/
+.cxx/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Project-specific bulky/generated folders
+releases/
+BackupCodeValPic20-4-26/
+Backups/
+ValuePicsCheckpoint1/
+ValuePicUnified_*/
+.github/java-upgrade/
+
+# Local backup archives
+*.zip
+*.tar.gz
+
+# Generated device captures and UI dumps in the repo root
+emulator_*.png
+emulator_*.xml
+export_*.png
+export_*.xml
+export_*.txt
+lookup_*.txt
+phys_*.png
+phys_*.xml
+post_*.png
+post_*.xml
+post_*.txt
+smoke_*.txt
+valuepics_*.png
+valuepics_*.xml
+window_*.png
+window_*.xml
+
+# Generated verification logs and reports in the repo root
+build_*out.txt
+build_*verify.txt
+compile_errors.txt
+fix5_*.txt
+gradle_compile_check.txt
+polish_compile_check*.txt
+review_compile_check.txt
+restore_*.txt
+package_abc_stacktrace.txt
+

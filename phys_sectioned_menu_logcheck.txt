@@ -1,0 +1,1 @@
+04-30 22:46:05.897  7126  7159 E AndroidRuntime: FATAL EXCEPTION: BeaconManagerWorkHandler

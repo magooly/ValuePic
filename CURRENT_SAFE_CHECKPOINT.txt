@@ -1,0 +1,48 @@
+CURRENT SAFE CHECKPOINT
+=======================
+Date: 2026-04-18 (Final Update)
+File: app/src/main/java/com/example/valuefinder/ui/DetailsScreen.kt
+
+Latest changes implemented:
+1. ItemListScreen: Darkened red background tint from alpha 0.04 to 0.12 for better visibility
+2. DetailsScreen: Auto-fetch full web description when one-line AI is filled and full description is empty
+3. DetailsScreen: Reorganized layout - full web description now appears above saved comparables
+4. DetailsScreen: Removed duplicate Save buttons:
+   - Removed Save/Cancel from TopAppBar when editing
+   - Removed Save button above saved comparables section
+   - Kept single Save button at end of form (before detected labels section)
+
+Key responsibilities (UI):
+- ItemListScreen: displays items, filters by collection/tags, search, manages collections
+- DetailsScreen: displays single item details, allows editing, shows web description and comparables
+- ManageCollectionsDialog: add/rename/delete collections with bulk record updates
+
+Save button flow:
+- Only one Save button visible when editing, located at bottom of form
+- Edit/Delete buttons always visible in TopAppBar when not editing
+- Back button behavior preserved for dismissing edits
+
+Auto-fetch logic:
+- Triggered in DetailsScreen LaunchedEffect when viewing an item with one-line AI but no full web description
+- Automatically calls onFetchFullDescription() to populate fullWebDescription
+- Prevents multiple calls with hasRequestedAutoFullDescription flag
+
+No known issues at this checkpoint.
+
+Latest release artifact (timestamped copy):
+- Folder: releases/20260418_102251
+- APK: releases/20260418_102251/app-release.apk
+- SHA file: releases/20260418_102251/app-release.apk.sha256.txt
+- Size: 55.46 MB (56790 KB)
+- SHA256: B416CD607DEA0C371F57AFF33F7A6DCDBED1FE45095FCAB7C57C20ED084B1F77
+
+Current build (post-final-update):
+- APK: app/build/outputs/apk/release/app-release.apk
+- Size: 55.51 MB (56,847 KB)
+- Build time: 2026-04-18
+
+BestValuePics fallback marker:
+- Folder: releases/BestValuePics
+- APK: releases/BestValuePics/app-release.apk
+- SHA file: releases/BestValuePics/app-release.apk.sha256.txt
+

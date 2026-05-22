@@ -1,0 +1,4 @@
+List of devices attached
+70d2bcf1	device
+emulator-5554	device
+

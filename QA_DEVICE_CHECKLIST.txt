@@ -1,0 +1,228 @@
+ValuePics Device Verification - April 18, 2026
+
+Build Under Test
+- Build type: [debug / release]
+- APK path:
+- Device:
+- Android version:
+- Test start time:
+
+--------------------------------------------------
+1) App Launch
+[ ] PASS
+[ ] FAIL
+Notes:
+- App launches successfully:
+- Any crash on startup:
+- Unexpected permission prompts:
+
+--------------------------------------------------
+2) Search / Filter Reset
+[ ] PASS
+[ ] FAIL
+Steps checked:
+- Entered search text
+- Selected collection
+- Selected tag
+- Tapped clear-filters icon
+
+Expected:
+- Search text cleared
+- Collection reset to All Collections
+- Tag reset to All Tags
+- Full database list visible again
+
+Actual:
+-
+
+--------------------------------------------------
+3) Camera Flow
+[ ] PASS
+[ ] FAIL
+Steps checked:
+- Opened camera screen
+- Granted camera permission if prompted
+- Took photo
+- Saved valuation
+
+Expected:
+- Camera opens
+- Photo saved
+- Item appears in list
+- No storage permission prompt
+
+Actual:
+-
+
+--------------------------------------------------
+4) Gallery Import Flow
+[ ] PASS
+[ ] FAIL
+Steps checked:
+- Opened gallery picker
+- Selected image
+- Saved valuation
+
+Expected:
+- Picker opens
+- Image imports successfully
+- Item appears in list
+- No storage permission prompt
+
+Actual:
+-
+
+--------------------------------------------------
+5) About Dialog
+[ ] PASS
+[ ] FAIL
+Checks:
+- About opens
+- Database size visible
+- How To button works
+- Export PDF button visible
+- Email Database button visible
+
+Actual:
+-
+
+--------------------------------------------------
+6) PDF Export
+[ ] PASS
+[ ] FAIL
+Steps checked:
+- Exported PDF from About
+- PDF dialog appeared
+- Tested Open
+- Tested Share
+- Tested Print
+
+Expected:
+- PDF created successfully
+- Open works or shows correct "no app" message
+- Share works
+- Print works or shows correct service-unavailable message
+
+Actual:
+- Export path shown:
+- Open result:
+- Share result:
+- Print result:
+
+--------------------------------------------------
+7) Email Database
+[ ] PASS
+[ ] FAIL
+Steps checked:
+- Tapped Email Database
+- Chooser opened
+- Selected email app
+- ZIP attachment included
+- Subject populated
+
+Expected:
+- Database ZIP attached
+- No URI/file access error
+- Draft/send possible
+
+Actual:
+- Attachment filename:
+- Subject:
+- Error seen (if any):
+
+--------------------------------------------------
+8) Backup
+[ ] PASS
+[ ] FAIL
+Steps checked:
+- Created backup ZIP using document picker
+- Backup completed toast shown
+
+Expected:
+- ZIP created
+- Backup summary counts look correct
+
+Actual:
+- Backup file location:
+- Toast/result:
+
+--------------------------------------------------
+9) Restore
+[ ] PASS
+[ ] FAIL
+Steps checked:
+- Changed data before restore
+- Restored from ZIP
+- Verified items/photos came back
+
+Expected:
+- Restore completes
+- Correct item/photo counts
+- Full list reflects restored DB
+- About database size updates
+
+Actual:
+-
+
+--------------------------------------------------
+10) Item Details
+[ ] PASS
+[ ] FAIL
+Checks:
+- Details screen opens
+- Valued date looks correct
+- Share record works
+- Share photo works
+- Open/copy source link works
+
+Actual:
+-
+
+--------------------------------------------------
+11) Rotation / Background Resume
+[ ] PASS
+[ ] FAIL
+Checks:
+- App survives background/foreground
+- No lost state beyond expected navigation behavior
+- No crash on rotation/resume
+
+Actual:
+-
+
+--------------------------------------------------
+12) Overall Result
+[ ] RELEASE READY
+[ ] NEEDS FIXES
+
+Blocking issues:
+1.
+2.
+3.
+
+Non-blocking issues:
+1.
+2.
+3.
+
+Test end time:
+
+--------------------------------------------------
+Quick Verdict Rule
+
+Release Ready if all core flows pass:
+- App launch
+- Search/filter reset
+- Camera or gallery import
+- Backup
+- Restore
+- PDF export
+- Email database
+
+Needs Fixes if any of these occur:
+- Any crash
+- Restore corrupts or replaces data incorrectly
+- PDF or database sharing fails due to URI/file access
+- Camera or gallery flow blocked
+- Full DB cannot be restored via filter reset
+

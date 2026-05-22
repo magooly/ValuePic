@@ -1,0 +1,370 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 11,
+    "identityHash": "9b2052aca1b857b41a9029e4d0740d11",
+    "entities": [
+      {
+        "tableName": "valued_items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `photoPath` TEXT NOT NULL, `photoSource` TEXT NOT NULL, `itemName` TEXT NOT NULL, `collectionName` TEXT NOT NULL, `shortAiDescription` TEXT NOT NULL, `fullWebDescription` TEXT NOT NULL, `itemDescription` TEXT NOT NULL, `detectedLabels` TEXT NOT NULL, `estimatedValue` REAL, `currency` TEXT NOT NULL, `valueSource` TEXT NOT NULL, `sourceUrl` TEXT NOT NULL, `searchResults` TEXT NOT NULL, `confidence` REAL NOT NULL, `createdAtMillis` INTEGER NOT NULL, `dateTaken` TEXT NOT NULL, `dateValued` INTEGER NOT NULL, `notes` TEXT NOT NULL, `tags` TEXT NOT NULL, `includeInTotals` INTEGER NOT NULL, `excludeFromPdfReport` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "photoPath",
+            "columnName": "photoPath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "photoSource",
+            "columnName": "photoSource",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemName",
+            "columnName": "itemName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "collectionName",
+            "columnName": "collectionName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shortAiDescription",
+            "columnName": "shortAiDescription",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fullWebDescription",
+            "columnName": "fullWebDescription",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemDescription",
+            "columnName": "itemDescription",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "detectedLabels",
+            "columnName": "detectedLabels",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "estimatedValue",
+            "columnName": "estimatedValue",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "currency",
+            "columnName": "currency",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "valueSource",
+            "columnName": "valueSource",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceUrl",
+            "columnName": "sourceUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "searchResults",
+            "columnName": "searchResults",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "confidence",
+            "columnName": "confidence",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtMillis",
+            "columnName": "createdAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateTaken",
+            "columnName": "dateTaken",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateValued",
+            "columnName": "dateValued",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tags",
+            "columnName": "tags",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "includeInTotals",
+            "columnName": "includeInTotals",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "excludeFromPdfReport",
+            "columnName": "excludeFromPdfReport",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_valued_items_collectionName",
+            "unique": false,
+            "columnNames": [
+              "collectionName"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_valued_items_collectionName` ON `${TABLE_NAME}` (`collectionName`)"
+          },
+          {
+            "name": "index_valued_items_dateValued",
+            "unique": false,
+            "columnNames": [
+              "dateValued"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_valued_items_dateValued` ON `${TABLE_NAME}` (`dateValued`)"
+          },
+          {
+            "name": "index_valued_items_estimatedValue",
+            "unique": false,
+            "columnNames": [
+              "estimatedValue"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_valued_items_estimatedValue` ON `${TABLE_NAME}` (`estimatedValue`)"
+          },
+          {
+            "name": "index_valued_items_itemName",
+            "unique": false,
+            "columnNames": [
+              "itemName"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_valued_items_itemName` ON `${TABLE_NAME}` (`itemName`)"
+          }
+        ]
+      },
+      {
+        "tableName": "valuation_drafts",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`photoPath` TEXT NOT NULL, `schemaVersion` INTEGER NOT NULL, `photoSource` TEXT NOT NULL, `itemName` TEXT NOT NULL, `itemDescription` TEXT NOT NULL, `itemTags` TEXT NOT NULL, `editableValue` TEXT NOT NULL, `userEditedValue` INTEGER NOT NULL, `selectedCollection` TEXT NOT NULL, `doNotIncludeInTotals` INTEGER NOT NULL, `detailedLookupMode` INTEGER NOT NULL, `savedAtMillis` INTEGER NOT NULL, PRIMARY KEY(`photoPath`))",
+        "fields": [
+          {
+            "fieldPath": "photoPath",
+            "columnName": "photoPath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "schemaVersion",
+            "columnName": "schemaVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "photoSource",
+            "columnName": "photoSource",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemName",
+            "columnName": "itemName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemDescription",
+            "columnName": "itemDescription",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemTags",
+            "columnName": "itemTags",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "editableValue",
+            "columnName": "editableValue",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userEditedValue",
+            "columnName": "userEditedValue",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "selectedCollection",
+            "columnName": "selectedCollection",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "doNotIncludeInTotals",
+            "columnName": "doNotIncludeInTotals",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "detailedLookupMode",
+            "columnName": "detailedLookupMode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "savedAtMillis",
+            "columnName": "savedAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "photoPath"
+          ]
+        }
+      },
+      {
+        "tableName": "item_photos",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `itemId` INTEGER NOT NULL, `photoPath` TEXT NOT NULL, `sortOrder` INTEGER NOT NULL, `isCover` INTEGER NOT NULL, `createdAtMillis` INTEGER NOT NULL, FOREIGN KEY(`itemId`) REFERENCES `valued_items`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemId",
+            "columnName": "itemId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "photoPath",
+            "columnName": "photoPath",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortOrder",
+            "columnName": "sortOrder",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCover",
+            "columnName": "isCover",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAtMillis",
+            "columnName": "createdAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_item_photos_itemId",
+            "unique": false,
+            "columnNames": [
+              "itemId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_item_photos_itemId` ON `${TABLE_NAME}` (`itemId`)"
+          },
+          {
+            "name": "index_item_photos_itemId_sortOrder",
+            "unique": false,
+            "columnNames": [
+              "itemId",
+              "sortOrder"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_item_photos_itemId_sortOrder` ON `${TABLE_NAME}` (`itemId`, `sortOrder`)"
+          },
+          {
+            "name": "index_item_photos_itemId_isCover",
+            "unique": false,
+            "columnNames": [
+              "itemId",
+              "isCover"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_item_photos_itemId_isCover` ON `${TABLE_NAME}` (`itemId`, `isCover`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "valued_items",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "itemId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9b2052aca1b857b41a9029e4d0740d11')"
+    ]
+  }
+}

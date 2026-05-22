@@ -1,0 +1,111 @@
+ValuePics Signed Release Setup
+April 18, 2026
+
+This project now expects release signing values to be supplied from Gradle properties or environment variables.
+
+Required values
+
+1. VALUEFINDER_STORE_FILE
+   Full path to the keystore file.
+
+2. VALUEFINDER_STORE_PASSWORD
+   Password for the keystore.
+
+3. VALUEFINDER_KEY_ALIAS
+   Alias name of the signing key.
+
+4. VALUEFINDER_KEY_PASSWORD
+   Password for the key alias.
+
+How the project resolves signing values
+
+The release build logic in `app\build.gradle.kts` reads values in this order:
+
+1. Gradle property
+2. Environment variable
+3. For the keystore path only, fallback to `valuefinder-release.jks` in the project root if that file exists
+
+Important
+
+- A signed release build needs all 4 values.
+- If any signing value is missing, Gradle will still configure the project, but the release build will not be signed through the custom release signing config.
+- Do not store real passwords in source-controlled files.
+
+Recommended options
+
+Option A - User-level environment variables
+Use this when you want the values available outside the repo and not committed.
+
+PowerShell (current terminal session only):
+
+$env:VALUEFINDER_STORE_FILE="C:\path\to\valuefinder-release.jks"
+$env:VALUEFINDER_STORE_PASSWORD="your-store-password"
+$env:VALUEFINDER_KEY_ALIAS="valuefinder"
+$env:VALUEFINDER_KEY_PASSWORD="your-key-password"
+
+Build signed release:
+
+.\gradlew.bat assembleRelease
+
+Option B - Persistent Windows user environment variables
+Use this when you want them remembered across terminals for your Windows user account.
+
+PowerShell:
+
+[System.Environment]::SetEnvironmentVariable("VALUEFINDER_STORE_FILE", "C:\path\to\valuefinder-release.jks", "User")
+[System.Environment]::SetEnvironmentVariable("VALUEFINDER_STORE_PASSWORD", "your-store-password", "User")
+[System.Environment]::SetEnvironmentVariable("VALUEFINDER_KEY_ALIAS", "valuefinder", "User")
+[System.Environment]::SetEnvironmentVariable("VALUEFINDER_KEY_PASSWORD", "your-key-password", "User")
+
+Then close and reopen the terminal before building:
+
+.\gradlew.bat assembleRelease
+
+Option C - Local Gradle properties (not for committed secrets)
+Use this only in a machine-local file that will not be committed.
+
+You can place entries in a local, ignored Gradle properties file if you maintain one outside source control.
+Example values:
+
+VALUEFINDER_STORE_FILE=C:\\path\\to\\valuefinder-release.jks
+VALUEFINDER_STORE_PASSWORD=your-store-password
+VALUEFINDER_KEY_ALIAS=valuefinder
+VALUEFINDER_KEY_PASSWORD=your-key-password
+
+Option D - Helper script in repo
+Use `set-signing-env.ps1` to set signing variables for the current process and optionally persist at User scope.
+
+Example:
+
+.\set-signing-env.ps1 -StorePassword "your-store-password" -KeyPassword "your-key-password" -PersistUser
+
+Notes:
+- Default keystore path is `valuefinder-release-new.jks` in the project root.
+- If `-KeyPassword` is omitted, it defaults to `-StorePassword`.
+
+Quick verification
+
+Run this command from the project root:
+
+.\gradlew.bat assembleRelease
+
+If signing values are missing, you will see the informational message:
+
+Release signing credentials are not fully configured. Set VALUEFINDER_* properties for signed release builds.
+
+Suggested secure workflow
+
+1. Keep the keystore file outside source control when possible.
+2. Store passwords in user environment variables or a local untracked machine-only config.
+3. Build with `assembleRelease` only after all 4 values are set.
+4. Verify the generated APK/AAB before distribution.
+
+Checklist
+
+[ ] Keystore file exists
+[ ] VALUEFINDER_STORE_FILE set
+[ ] VALUEFINDER_STORE_PASSWORD set
+[ ] VALUEFINDER_KEY_ALIAS set
+[ ] VALUEFINDER_KEY_PASSWORD set
+[ ] `./gradlew.bat assembleRelease` succeeds
+[ ] Output artifact verified
