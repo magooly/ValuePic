@@ -48,5 +48,7 @@ jobs:
           arch: x86_64
           profile: pixel_5
           script: |
+            adb uninstall com.example.valuefinder.unified || true
+            adb uninstall com.example.valuefinder.unified.test || true
             ./gradlew :app:connectedDebugAndroidTest "-Pandroid.testInstrumentationRunnerArguments.class=com.example.valuefinder.ValuePicsDatabaseMigrationTest,com.example.valuefinder.ValuePicsBackupRestoreSmokeTest"
 
