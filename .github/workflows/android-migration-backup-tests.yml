@@ -44,10 +44,13 @@ jobs:
       - name: Run migration and backup smoke instrumentation tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
+          api-level: 34
           arch: x86_64
           profile: pixel_5
+          force-avd-creation: true
+          emulator-options: -no-window -no-audio -no-boot-anim -camera-back none -camera-front none -gpu swiftshader_indirect -partition-size 4096
           script: |
+            adb wait-for-device
             adb uninstall com.example.valuefinder.unified || true
             adb uninstall com.example.valuefinder.unified.test || true
             ./gradlew :app:connectedDebugAndroidTest "-Pandroid.testInstrumentationRunnerArguments.class=com.example.valuefinder.ValuePicsDatabaseMigrationTest,com.example.valuefinder.ValuePicsBackupRestoreSmokeTest"
