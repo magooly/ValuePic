@@ -41,10 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.valuefinder.DatabaseShareAttachment
 import com.example.valuefinder.AutoBackupSlotInfo
 import com.example.valuefinder.BuildConfig
@@ -67,7 +64,6 @@ import com.example.valuefinder.ui.dialogs.showDeleteUndoSnackbar
 import com.example.valuefinder.AppTier
 import com.example.valuefinder.ui.theme.ValuePicsTheme
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.navigation.compose.NavHost
@@ -106,7 +102,6 @@ private const val PREF_APP_TIER = "app_tier"
 private const val PREF_PERSONAL_TIER_PASSWORD = "personal_tier_password"
 private const val PREF_PERSONAL_TIER_LOCKED = "personal_tier_locked"
 private const val PREF_PERSONAL_TIER_LAST_UNLOCK_MILLIS = "personal_tier_last_unlock_millis"
-private const val PERSONAL_TIER_TIMEOUT_MILLIS = 15L * 60L * 1000L
 private const val DEFAULT_WILL_OWNER_NAME = "Wally Horsman"
 private const val EXPORT_LOG_TAG = "ValuePicsExport"
 
@@ -301,10 +296,8 @@ fun ValuePicsApp() {
             .apply()
     }
 
-    fun isPersonalSessionExpired(nowMillis: Long = System.currentTimeMillis()): Boolean {
-        if (personalTierLocked) return true
-        if (personalTierLastUnlockMillis <= 0L) return true
-        return nowMillis - personalTierLastUnlockMillis >= PERSONAL_TIER_TIMEOUT_MILLIS
+    fun isPersonalSessionExpired(): Boolean {
+        return personalTierLocked
     }
 
     fun lockPersonalTier() {
@@ -337,35 +330,6 @@ fun ValuePicsApp() {
     }
 
     val updateAppTier: (AppTier) -> Unit = { selected -> requestTierSwitch(selected) }
-
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner, appTier, personalTierLocked, personalTierLastUnlockMillis) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
-                if (appTier == AppTier.PERSONAL && isPersonalSessionExpired()) {
-                    lockPersonalTier()
-                    applyTierImmediately(AppTier.INSURANCE)
-                }
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
-
-    LaunchedEffect(appTier, personalTierLocked, personalTierLastUnlockMillis) {
-        if (appTier != AppTier.PERSONAL || personalTierLocked) return@LaunchedEffect
-        while (true) {
-            val elapsed = System.currentTimeMillis() - personalTierLastUnlockMillis
-            val remaining = PERSONAL_TIER_TIMEOUT_MILLIS - elapsed
-            if (remaining <= 0L) {
-                lockPersonalTier()
-                applyTierImmediately(AppTier.INSURANCE)
-                Toast.makeText(context, context.getString(R.string.personal_lock_timeout_message), Toast.LENGTH_SHORT).show()
-                break
-            }
-            delay(minOf(remaining, 1_000L))
-        }
-    }
 
     // Sync tier to repository on first composition and whenever appTier changes.
     LaunchedEffect(appTier) {
