@@ -325,6 +325,61 @@ object PhotoUtils {
         }.getOrDefault(false)
     }
 
+    fun rotatePhotoFile(context: Context, photoPath: String, degrees: Int): Boolean {
+        val normalized = ((degrees % 360) + 360) % 360
+        if (normalized == 0) return true
+
+        return runCatching {
+            val sourceFile = File(photoPath)
+            if (!sourceFile.exists()) return false
+
+            val source = BitmapFactory.decodeFile(photoPath) ?: return false
+            val oriented = applyExifOrientationFromFile(photoPath, source)
+            val matrix = Matrix().apply { postRotate(normalized.toFloat()) }
+            val rotated = Bitmap.createBitmap(oriented, 0, 0, oriented.width, oriented.height, matrix, true)
+
+            val tempFile = File(sourceFile.parentFile, "${sourceFile.name}.rotate.tmp")
+            runCatching {
+                writeOptimizedBitmapToFile(context, rotated, tempFile)
+            }.onFailure {
+                if (tempFile.exists()) tempFile.delete()
+                rotated.recycle()
+                if (oriented !== source) oriented.recycle()
+                source.recycle()
+                return false
+            }
+
+            if (!tempFile.exists() || tempFile.length() <= 0L) {
+                if (tempFile.exists()) tempFile.delete()
+                rotated.recycle()
+                if (oriented !== source) oriented.recycle()
+                source.recycle()
+                return false
+            }
+
+            if (!sourceFile.delete()) {
+                tempFile.delete()
+                rotated.recycle()
+                if (oriented !== source) oriented.recycle()
+                source.recycle()
+                return false
+            }
+
+            if (!tempFile.renameTo(sourceFile)) {
+                tempFile.delete()
+                rotated.recycle()
+                if (oriented !== source) oriented.recycle()
+                source.recycle()
+                return false
+            }
+
+            rotated.recycle()
+            if (oriented !== source) oriented.recycle()
+            source.recycle()
+            true
+        }.getOrDefault(false)
+    }
+
     fun deletePhotoFile(photoPath: String): Boolean = runCatching { File(photoPath).delete() }.getOrDefault(false)
 
     /**

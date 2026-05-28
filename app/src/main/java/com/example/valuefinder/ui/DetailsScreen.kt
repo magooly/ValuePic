@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -62,6 +63,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.valuefinder.PhotoUtils
 import com.example.valuefinder.MoneyUtils
 import com.example.valuefinder.ItemPhoto
 import com.example.valuefinder.R
@@ -91,6 +94,7 @@ import java.util.Locale
 import kotlinx.coroutines.launch
 
 private const val AUDIO_NOTE_PREF_KEY = "audio_note_high_quality"
+private const val DETAILS_MAX_GALLERY_BATCH_ITEMS = 50
 
 private fun Context.billsValueSuffix(period: BillsPeriod): String = when (period) {
     BillsPeriod.WEEKLY -> getString(R.string.bills_value_suffix_week)
@@ -147,6 +151,7 @@ fun DetailsScreen(
     onOpenSourceLink: (String) -> Unit,
     onSetCoverPhoto: (Int, Int) -> Unit,
     onRequestAddPhoto: (Int) -> Unit,
+    onRequestAddGalleryPhoto: (Int) -> Unit,
     onDeletePhotoFromItem: (Int, Int) -> Unit,
     onCopyToOtherTier: (Int, (Result<Unit>) -> Unit) -> Unit = { _, _ -> },
 ) {
@@ -160,6 +165,8 @@ fun DetailsScreen(
     var isEditing by remember { mutableStateOf(false) }
     var showItemNameError by remember { mutableStateOf(false) }
     var failedPhotoPaths by remember(item.id) { mutableStateOf(setOf<String>()) }
+    var photoRenderVersion by remember(item.id) { mutableIntStateOf(0) }
+    var showEditPhotoDialog by remember(item.id) { mutableStateOf(false) }
     var showCollectionDropdown by remember { mutableStateOf(false) }
     var showOverflowMenu by remember { mutableStateOf(false) }
     var editState by remember {
@@ -489,6 +496,36 @@ fun DetailsScreen(
         if (!showFullscreenPhotoViewer) return@LaunchedEffect
         fullscreenPhotoScale = 1f
         fullscreenPhotoOffset = Offset.Zero
+    }
+
+    fun currentDetailPhotoOrNull(): DetailPhotoEntry? {
+        if (detailPhotos.isEmpty()) return null
+        val index = photoPagerState.currentPage.coerceIn(0, detailPhotos.lastIndex)
+        return detailPhotos.getOrNull(index)
+    }
+
+    fun rotateCurrentDetailPhoto(clockwise: Boolean) {
+        val selectedPhoto = currentDetailPhotoOrNull() ?: return
+        val rotated = PhotoUtils.rotatePhotoFile(
+            context = context,
+            photoPath = selectedPhoto.path,
+            degrees = if (clockwise) 90 else -90
+        )
+        if (!rotated) {
+            Toast.makeText(context, context.getString(R.string.camera_rotate_failed), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        failedPhotoPaths = failedPhotoPaths - selectedPhoto.path
+        photoRenderVersion += 1
+    }
+
+    fun photoModel(path: String): ImageRequest {
+        return ImageRequest.Builder(context)
+            .data(File(path))
+            .memoryCacheKey("${path}_${photoRenderVersion}")
+            .diskCacheKey("${path}_${photoRenderVersion}")
+            .build()
     }
 
     fun resetEdits() {
@@ -838,7 +875,7 @@ fun DetailsScreen(
             .verticalScroll(scrollState)
     ) {
         TopAppBar(
-            title = { Text(item.itemName) },
+            title = { Text(stringResource(R.string.details_title)) },
             navigationIcon = {
                 IconButton(onClick = { requestBackNavigation() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.common_back))
@@ -946,7 +983,7 @@ fun DetailsScreen(
                         val photo = detailPhotos[page]
                         if (File(photo.path).exists() && !failedPhotoPaths.contains(photo.path)) {
                             AsyncImage(
-                                model = File(photo.path),
+                                model = photoModel(photo.path),
                                 contentDescription = stringResource(R.string.details_item_photo),
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Fit,
@@ -1011,6 +1048,11 @@ fun DetailsScreen(
                         TextButton(onClick = { showFullscreenPhotoViewer = true }) {
                             Text(stringResource(R.string.details_view_full_screen))
                         }
+                        if (isEditing) {
+                            TextButton(onClick = { showEditPhotoDialog = true }) {
+                                Text(stringResource(R.string.details_edit_photo))
+                            }
+                        }
                         if (detailPhotos.size > 1 && currentPhoto.id != null && !currentPhoto.isCover) {
                             TextButton(onClick = { onSetCoverPhoto(item.id, currentPhoto.id) }) {
                                 Text(stringResource(R.string.details_set_as_cover))
@@ -1048,7 +1090,13 @@ fun DetailsScreen(
                             onClick = { onRequestAddPhoto(item.id) },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(stringResource(R.string.details_add_photo))
+                            Text(stringResource(R.string.details_add_photo_camera))
+                        }
+                        OutlinedButton(
+                            onClick = { onRequestAddGalleryPhoto(item.id) },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(stringResource(R.string.details_add_photo_gallery))
                         }
                     }
                     Row(
@@ -1187,7 +1235,7 @@ fun DetailsScreen(
                                         }
                                     }
                                     AsyncImage(
-                                        model = File(photo.path),
+                                        model = photoModel(photo.path),
                                         contentDescription = stringResource(R.string.details_item_photo),
                                         modifier = Modifier
                                             .fillMaxSize()
@@ -1249,6 +1297,41 @@ fun DetailsScreen(
                 }
             }
 
+            if (showEditPhotoDialog && detailPhotos.isNotEmpty()) {
+                AlertDialog(
+                    onDismissRequest = { showEditPhotoDialog = false },
+                    title = { Text(stringResource(R.string.details_edit_photo)) },
+                    text = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            OutlinedButton(
+                                onClick = { rotateCurrentDetailPhoto(clockwise = false) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Filled.RotateLeft, contentDescription = null)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(stringResource(R.string.camera_rotate_left))
+                            }
+                            OutlinedButton(
+                                onClick = { rotateCurrentDetailPhoto(clockwise = true) },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Filled.RotateRight, contentDescription = null)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(stringResource(R.string.camera_rotate_right))
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showEditPhotoDialog = false }) {
+                            Text(stringResource(R.string.common_close))
+                        }
+                    }
+                )
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -1282,28 +1365,6 @@ fun DetailsScreen(
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
                     colors = editFieldColors
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = editState.description,
-                        onValueChange = {
-                            editState = editState.copy(description = enforceLeadingCapitalization(it))
-                        },
-                        label = { Text(stringResource(R.string.details_description_label)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 2,
-                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
-                        colors = editFieldColors
-                    )
-                    if (editState.description.isNotEmpty()) {
-                        IconButton(
-                            onClick = { editState = editState.copy(description = "") },
-                            modifier = Modifier.align(Alignment.TopEnd)
-                        ) {
-                            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.list_cd_clear_search), modifier = Modifier.size(18.dp))
-                        }
-                    }
-                }
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = editState.tags,
@@ -1517,8 +1578,6 @@ fun DetailsScreen(
             } else {
                 // Details
                 Text(item.itemName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(item.itemDescription, style = MaterialTheme.typography.bodyLarge)
                 if (item.estimatedValue != null) {
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(

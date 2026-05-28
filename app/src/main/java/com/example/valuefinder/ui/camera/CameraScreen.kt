@@ -35,6 +35,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.automirrored.filled.RotateLeft
+import androidx.compose.material.icons.automirrored.filled.RotateRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -52,6 +54,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -71,9 +74,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.valuefinder.PhotoUtils
 import com.example.valuefinder.R
 import com.example.valuefinder.ui.ThemeMode
+import com.example.valuefinder.ui.AppDestination
 import java.io.File
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -99,6 +104,7 @@ fun CameraScreen(
     appTier: com.example.valuefinder.AppTier = com.example.valuefinder.AppTier.PERSONAL,
     onAppTierSelected: (com.example.valuefinder.AppTier) -> Unit = {},
     supportsMultiGalleryImport: Boolean,
+    initialSource: String,
     onCancel: () -> Unit
 ) {
     val context = LocalContext.current
@@ -134,6 +140,8 @@ fun CameraScreen(
     var previewHeightPx by remember { mutableStateOf(1f) }
     var reviewImageWidthPx by remember { mutableStateOf(1f) }
     var reviewImageHeightPx by remember { mutableStateOf(1f) }
+    var reviewImageVersion by remember { mutableIntStateOf(0) }
+    var hasAutoLaunchedInitialSource by remember { mutableStateOf(false) }
     var activeClipHandle by remember { mutableStateOf(ClipHandle.MOVE) }
     var showOverflowMenu by remember { mutableStateOf(false) }
     var handleInsetPreset by remember {
@@ -171,7 +179,7 @@ fun CameraScreen(
         }
     }
 
-    LaunchedEffect(reviewPhotoPath) {
+    LaunchedEffect(reviewPhotoPath, reviewImageVersion) {
         val path = reviewPhotoPath ?: return@LaunchedEffect
         val opts = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(path, opts)
@@ -361,6 +369,14 @@ fun CameraScreen(
         }
     }
 
+    LaunchedEffect(initialSource, reviewPhotoPath, hasAutoLaunchedInitialSource) {
+        if (hasAutoLaunchedInitialSource || reviewPhotoPath != null) return@LaunchedEffect
+        hasAutoLaunchedInitialSource = true
+        if (initialSource == AppDestination.Camera.SOURCE_GALLERY) {
+            launchGallery()
+        }
+    }
+
     fun retryReviewCapture() {
         originalPhotoTempPath?.let { runCatching { File(it).delete() } }
         originalPhotoTempPath = null
@@ -406,6 +422,26 @@ fun CameraScreen(
         currentGalleryUri = null
         clearGalleryBatchState()
         onCancel()
+    }
+
+    fun rotateReviewPhoto(clockwise: Boolean) {
+        val path = reviewPhotoPath ?: return
+        val rotated = PhotoUtils.rotatePhotoFile(
+            context = context,
+            photoPath = path,
+            degrees = if (clockwise) 90 else -90
+        )
+        if (!rotated) {
+            Toast.makeText(context, context.getString(R.string.camera_rotate_failed), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Rotation changes the preview orientation and dimensions, so reset the clip box.
+        clipLeft = 0f
+        clipRight = 0f
+        clipTop = 0f
+        clipBottom = 0f
+        reviewImageVersion += 1
     }
 
     fun confirmReviewCapture(keepCameraOpenAfterConfirm: Boolean = false) {
@@ -801,6 +837,40 @@ fun CameraScreen(
                     stringResource(R.string.camera_review_instruction),
                     style = MaterialTheme.typography.bodySmall
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedButton(
+                        onClick = { rotateReviewPhoto(clockwise = false) },
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.RotateLeft, contentDescription = null)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            stringResource(R.string.camera_rotate_left),
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    OutlinedButton(
+                        onClick = { rotateReviewPhoto(clockwise = true) },
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp)
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.RotateRight, contentDescription = null)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            stringResource(R.string.camera_rotate_right),
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(10.dp))
                 BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
                     // Keep the whole photo + crop handles visible above the pinned bottom actions.
@@ -820,7 +890,11 @@ fun CameraScreen(
                     ) {
                         Box(modifier = Modifier.fillMaxSize()) {
                         AsyncImage(
-                            model = File(reviewPhotoPath!!),
+                            model = ImageRequest.Builder(context)
+                                .data(File(reviewPhotoPath!!))
+                                .memoryCacheKey("${reviewPhotoPath}_${reviewImageVersion}")
+                                .diskCacheKey("${reviewPhotoPath}_${reviewImageVersion}")
+                                .build(),
                             contentDescription = stringResource(R.string.details_item_photo),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Fit

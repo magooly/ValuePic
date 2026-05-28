@@ -143,6 +143,7 @@ Use Print to send it to a printer.</string>
     <string name="in_app_browser_reload">Reload</string>
 
     <string name="details_item_photo">Item photo</string>
+    <string name="details_title">Item details</string>
     <string name="details_photo_index">Photo %1$d of %2$d</string>
     <string name="details_set_as_cover">Set as cover</string>
     <string name="details_view_full_screen">View full screen</string>
@@ -150,6 +151,7 @@ Use Print to send it to a printer.</string>
     <string name="details_add_photo">Add Photo (Camera/Gallery)</string>
     <string name="details_add_photo_camera">Add from Camera</string>
     <string name="details_add_photo_gallery">Add from Gallery</string>
+    <string name="details_edit_photo">Rotate photo</string>
     <string name="details_delete_current_photo">Delete current photo</string>
     <string name="details_delete_photo_title">Delete photo?</string>
     <string name="details_delete_photo_message">This removes the selected photo from this item.</string>
@@ -264,6 +266,8 @@ Use Print to send it to a printer.</string>
     <string name="camera_gallery_batch_complete">Batch complete: %1$d imported, %2$d skipped, %3$d failed (%4$d/%5$d).</string>
     <string name="camera_review_title">Review photo</string>
     <string name="camera_review_instruction">Confirm your photo below. Drag the yellow box or corner handles to clip.</string>
+    <string name="camera_rotate_left">Rotate Left</string>
+    <string name="camera_rotate_right">Rotate Right</string>
     <string name="camera_retry">Retry</string>
     <string name="camera_ok_add_another">OK + Add another</string>
     <string name="camera_clip_title">Clip area (optional)</string>
@@ -285,6 +289,7 @@ Use Print to send it to a printer.</string>
     <string name="camera_photo_optimize_failed">Photo saved but could not be compressed — it may be larger than usual</string>
     <string name="camera_gallery_import_failed">Could not import that photo — please try another image</string>
     <string name="camera_clip_failed">Could not clip photo. Please retry.</string>
+    <string name="camera_rotate_failed">Could not rotate photo. Please retry.</string>
     <string name="common_image_unavailable">Image unavailable</string>
 
     <string name="list_title">ValuePics</string>

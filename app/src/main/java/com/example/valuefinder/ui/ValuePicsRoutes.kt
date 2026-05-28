@@ -193,6 +193,7 @@ internal fun ValuePicsCameraRoute(
     onPhotoTargetSizeChange: (Int) -> Unit,
     onPhotoCaptured: (String, String, Boolean) -> Unit,
     supportsMultiGalleryImport: Boolean,
+    initialSource: String,
     onCancel: () -> Unit
 ) {
     CameraScreen(
@@ -204,6 +205,7 @@ internal fun ValuePicsCameraRoute(
         appTier = appTier,
         onAppTierSelected = onAppTierSelected,
         supportsMultiGalleryImport = supportsMultiGalleryImport,
+        initialSource = initialSource,
         onCancel = onCancel
     )
 }
@@ -281,6 +283,7 @@ internal fun ValuePicsDetailsRoute(
     onFetchFullDescription: (ValuedItem) -> Unit,
     onSetCoverPhoto: SetCoverPhotoCallback,
     onRequestAddPhoto: (Int) -> Unit,
+    onRequestAddGalleryPhoto: (Int) -> Unit,
     onDeletePhotoFromItem: DeletePhotoCallback,
     onCopyToOtherTier: (Int, (Result<Unit>) -> Unit) -> Unit,
 ) {
@@ -328,6 +331,7 @@ internal fun ValuePicsDetailsRoute(
             onOpenSourceLink = onOpenSourceLink,
             onSetCoverPhoto = onSetCoverPhoto,
             onRequestAddPhoto = onRequestAddPhoto,
+            onRequestAddGalleryPhoto = onRequestAddGalleryPhoto,
             onDeletePhotoFromItem = onDeletePhotoFromItem,
             onCopyToOtherTier = onCopyToOtherTier,
         )

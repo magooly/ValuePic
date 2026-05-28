@@ -17,15 +17,22 @@ sealed interface AppDestination {
     data object Camera : AppDestination {
         const val BASE = "camera"
         const val ARG_ATTACH_ITEM_ID = "attachItemId"
+        const val ARG_INITIAL_SOURCE = "initialSource"
+        const val SOURCE_CAMERA = "camera"
+        const val SOURCE_GALLERY = "gallery"
         override val route: String = BASE
-        val routeWithArgs: String = "$BASE?$ARG_ATTACH_ITEM_ID={$ARG_ATTACH_ITEM_ID}"
+        val routeWithArgs: String = "$BASE?$ARG_ATTACH_ITEM_ID={$ARG_ATTACH_ITEM_ID}&$ARG_INITIAL_SOURCE={$ARG_INITIAL_SOURCE}"
 
-        fun createRoute(attachItemId: Int? = null): String {
-            return if (attachItemId != null && attachItemId > 0) {
-                "$BASE?$ARG_ATTACH_ITEM_ID=$attachItemId"
+        fun createRoute(
+            attachItemId: Int? = null,
+            initialSource: String = SOURCE_CAMERA
+        ): String {
+            val attachPart = if (attachItemId != null && attachItemId > 0) {
+                "$ARG_ATTACH_ITEM_ID=$attachItemId"
             } else {
-                BASE
+                "$ARG_ATTACH_ITEM_ID=-1"
             }
+            return "$BASE?$attachPart&$ARG_INITIAL_SOURCE=${Uri.encode(initialSource)}"
         }
     }
 

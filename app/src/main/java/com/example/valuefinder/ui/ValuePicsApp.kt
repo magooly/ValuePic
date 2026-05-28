@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -36,6 +37,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
@@ -64,6 +66,7 @@ import com.example.valuefinder.ui.dialogs.showDeleteUndoSnackbar
 import com.example.valuefinder.AppTier
 import com.example.valuefinder.ui.theme.ValuePicsTheme
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.navigation.compose.NavHost
@@ -102,6 +105,7 @@ private const val PREF_APP_TIER = "app_tier"
 private const val PREF_PERSONAL_TIER_PASSWORD = "personal_tier_password"
 private const val PREF_PERSONAL_TIER_LOCKED = "personal_tier_locked"
 private const val PREF_PERSONAL_TIER_LAST_UNLOCK_MILLIS = "personal_tier_last_unlock_millis"
+private const val PERSONAL_TIER_TIMEOUT_MILLIS = 30L * 60L * 1000L
 private const val DEFAULT_WILL_OWNER_NAME = "Wally Horsman"
 private const val EXPORT_LOG_TAG = "ValuePicsExport"
 
@@ -297,7 +301,16 @@ fun ValuePicsApp() {
     }
 
     fun isPersonalSessionExpired(): Boolean {
-        return personalTierLocked
+        if (personalTierLocked) return true
+        if (personalTierLastUnlockMillis <= 0L) return true
+        val elapsed = System.currentTimeMillis() - personalTierLastUnlockMillis
+        return elapsed >= PERSONAL_TIER_TIMEOUT_MILLIS
+    }
+
+    fun recordPersonalActivity() {
+        if (appTier != AppTier.PERSONAL || personalTierLocked) return
+        personalTierLastUnlockMillis = System.currentTimeMillis()
+        persistPersonalLockState()
     }
 
     fun lockPersonalTier() {
@@ -321,6 +334,7 @@ fun ValuePicsApp() {
 
         if (!isPersonalSessionExpired()) {
             applyTierImmediately(AppTier.PERSONAL)
+            recordPersonalActivity()
             return
         }
 
@@ -334,6 +348,19 @@ fun ValuePicsApp() {
     // Sync tier to repository on first composition and whenever appTier changes.
     LaunchedEffect(appTier) {
         viewModel.setCurrentTier(appTier)
+    }
+
+    // Auto-lock personal tier and switch back to insurance after inactivity timeout.
+    LaunchedEffect(appTier, personalTierLocked, personalTierLastUnlockMillis) {
+        if (appTier != AppTier.PERSONAL || personalTierLocked) return@LaunchedEffect
+        while (appTier == AppTier.PERSONAL && !personalTierLocked) {
+            if (isPersonalSessionExpired()) {
+                lockPersonalTier()
+                applyTierImmediately(AppTier.INSURANCE)
+                break
+            }
+            delay(15_000L)
+        }
     }
     var hasSeenSelectionHelper by remember {
         mutableStateOf(settingsPrefs.getBoolean(PREF_SELECTION_HELPER_SEEN, false))
@@ -800,7 +827,16 @@ fun ValuePicsApp() {
 
     ValuePicsTheme(darkTheme = useDarkTheme, appTier = appTier) {
         Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { innerPadding ->
-            androidx.compose.foundation.layout.Box(modifier = Modifier.padding(innerPadding)) {
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .pointerInput(appTier, personalTierLocked) {
+                        detectTapGestures(onPress = {
+                            recordPersonalActivity()
+                            tryAwaitRelease()
+                        })
+                    }
+            ) {
                 NavHost(
                     navController = navController,
                     startDestination = AppDestination.List.route
@@ -1149,11 +1185,19 @@ fun ValuePicsApp() {
                         navArgument(AppDestination.Camera.ARG_ATTACH_ITEM_ID) {
                             type = NavType.IntType
                             defaultValue = -1
+                        },
+                        navArgument(AppDestination.Camera.ARG_INITIAL_SOURCE) {
+                            type = NavType.StringType
+                            defaultValue = AppDestination.Camera.SOURCE_CAMERA
                         }
                     )
                 ) { entry ->
                     val attachItemId = entry.arguments?.getInt(AppDestination.Camera.ARG_ATTACH_ITEM_ID)
                         ?.takeIf { it > 0 }
+                    val initialSource = entry.arguments
+                        ?.getString(AppDestination.Camera.ARG_INITIAL_SOURCE)
+                        .orEmpty()
+                        .ifBlank { AppDestination.Camera.SOURCE_CAMERA }
                     ValuePicsCameraRoute(
                         photoTargetSizeKb = photoTargetSizeKb,
                         themeMode = themeMode,
@@ -1197,6 +1241,7 @@ fun ValuePicsApp() {
                             }
                         },
                         supportsMultiGalleryImport = true,
+                        initialSource = initialSource,
                         onCancel = {
                             if (attachItemId != null) {
                                 navController.navigate(AppDestination.Details.createRoute(attachItemId)) {
@@ -1337,6 +1382,16 @@ fun ValuePicsApp() {
                         onSetCoverPhoto = { itemId, photoId -> viewModel.setCoverPhoto(itemId, photoId) },
                         onRequestAddPhoto = { itemId ->
                             navController.navigate(AppDestination.Camera.createRoute(itemId)) {
+                                launchSingleTop = true
+                            }
+                        },
+                        onRequestAddGalleryPhoto = { itemId ->
+                            navController.navigate(
+                                AppDestination.Camera.createRoute(
+                                    attachItemId = itemId,
+                                    initialSource = AppDestination.Camera.SOURCE_GALLERY
+                                )
+                            ) {
                                 launchSingleTop = true
                             }
                         },

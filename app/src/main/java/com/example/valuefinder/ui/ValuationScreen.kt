@@ -679,37 +679,6 @@ fun ValuationScreen(
                 onQuickSave = { runSaveAction(saveAndAddAnother = false) }
             )
 
-            OutlinedTextField(
-                value = itemDescription,
-                onValueChange = {
-                    hasUserInteracted = true
-                    val updated = enforceLeadingCapitalization(it)
-                    userEditedDescription = updated.isNotBlank() && updated != lastAutoDescription
-                    itemDescription = updated
-                },
-                label = { Text(stringResource(R.string.valuation_item_description)) },
-                trailingIcon = {
-                    if ((isDescriptionFocused || isDescriptionHovered) && itemDescription.isNotBlank()) {
-                        IconButton(onClick = {
-                            hasUserInteracted = true
-                            itemDescription = ""
-                            userEditedDescription = false
-                            lastAutoDescription = ""
-                        }) {
-                            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.common_close))
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)
-                    .onFocusChanged { isDescriptionFocused = it.isFocused }
-                    .hoverable(interactionSource = descriptionInteractionSource),
-                interactionSource = descriptionInteractionSource,
-                minLines = 2,
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
-            )
-
             CategorySelectorSection(
                 selectedCollection = selectedCollection,
                 effectiveCollections = effectiveCollections,
